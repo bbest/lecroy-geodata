@@ -1,0 +1,61 @@
+---
+title: "LeCroy Geodata Help"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Original
+
+Sorry - here is essentially what I do. There are no error messages since it runs, but the result is incorrect because all points are shown as being a single point within a single polygon.
+The coordinates are different and that is likely the issue but I can't figure out how to correct it. The bounding boxes show this:
+
+```
+shapefile_util@bbox
+        min      max
+x -374446.5 540037.5
+y -604489.9 450020.7
+
+v_comp@bbox
+           min        max
+lon -124.17578 -115.55391
+lat   32.54582   40.80654
+
+
+Here is the code:
+
+library(tidyverse)
+library(sp)
+library(spatialEco)
+
+#import voucher data
+v_comp <- read_csv(
+       paste0("X:/Corporate-3-Share/HVIP/Monthly Reporting/Map Tool Data/",
+              "ALL_vouchers_final_map_data_",
+              export_date,
+              ".csv"
+       )
+)
+
+#convert points to spatialpointsdataframe 
+v_comp <-
+       SpatialPointsDataFrame(
+              v_comp[, 15:16],
+              v_comp[, 1:22],
+              proj4string = CRS("+proj=longlat +datum=WGS84")
+       )
+
+#Import shapefile of counties
+shapefile_util <-
+       readShapeSpatial(
+              'X:/Corporate-3-Share/HVIP/Monthly Reporting/R Code/GeoClassification/GeoData/UtilityShapefile/California_Electric_Utility_Service_Territory_.shp',
+              proj4string = CRS( "+proj=longlat +datum=WGS84"  )
+       )
+
+#Match data with utility  polygons
+matched_AD_SD_cty_cen_u <- 
+       point.in.poly(matched_AD_SD_cty_cen,
+                     shapefile_utilities)
+```
